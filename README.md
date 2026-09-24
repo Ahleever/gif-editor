@@ -10,13 +10,13 @@ Open `index.html` in a browser.
 
 The editor works with demo results by default. To enable Klipy search, create a test key at [partner.klipy.com/api-keys](https://partner.klipy.com/api-keys), then set it before loading the page:
 
-```html
+```js
 <script>
   window.KLIPY_API_KEY = "your-key";
 </script>
 ```
 
-Place the configuration script before the application script in `index.html`. Klipy test keys allow up to 100 requests per hour. Use a restricted key for public hosting and follow Klipy attribution requirements.
+For local use, copy `config.example.js` to `config.js` and add the key there. `config.js` is ignored by Git. Klipy test keys allow up to 100 requests per hour. Do not publish the key in a public static site. Use a server-side proxy for public hosting and follow Klipy attribution requirements.
 
 ## Next steps
 
