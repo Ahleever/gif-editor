@@ -25,3 +25,7 @@ For local use, copy `config.example.js` to `config.js` and add the key there. `c
 - Render timed captions from source GIF frames.
 
 The current export creates a local GIF from the preview and caption. It uses `gif.js` from a CDN, so the browser does the rendering and no upload is required.
+
+## Public search proxy
+
+`api/search.js` is a Vercel-compatible serverless function. Set `KLIPY_API_KEY` as a server environment variable. Then set `window.LOOPLINE_SEARCH_PROXY_URL` in the frontend to the deployed function URL. Do not put the Klipy key in the frontend.

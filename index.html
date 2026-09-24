@@ -27,6 +27,7 @@
   <script>
     const demoGifs = Array.from(document.querySelectorAll('.gif'));
     const klipyApiKey = window.KLIPY_API_KEY || '';
+    const searchProxyUrl = window.LOOPLINE_SEARCH_PROXY_URL || '';
 
     function updateCaption(){const v=document.getElementById('captionInput').value;document.getElementById('previewCaption').innerHTML=v.replace(/\n/g,'<br>');document.getElementById('char').textContent=v.length+' / 80'}
     function resizeCaption(v){document.getElementById('previewCaption').style.fontSize=v+'px'}
@@ -35,8 +36,10 @@
     async function searchGifs(){
       const query=document.getElementById('search').value.trim()||'reaction';
       document.getElementById('resultTitle').textContent='More like “'+query+'”';
-      if(!klipyApiKey){return}
-      const endpoint='https://api.klipy.com/v2/search?q='+encodeURIComponent(query)+'&key='+encodeURIComponent(klipyApiKey)+'&client_key=loopline&limit=5&media_filter=gif';
+      if(!klipyApiKey&&!searchProxyUrl){return}
+      const endpoint=searchProxyUrl
+        ? searchProxyUrl+'?q='+encodeURIComponent(query)
+        : 'https://api.klipy.com/v2/search?q='+encodeURIComponent(query)+'&key='+encodeURIComponent(klipyApiKey)+'&client_key=loopline&limit=5&media_filter=gif';
       try{
         const response=await fetch(endpoint);
         if(!response.ok){throw new Error('GIF search failed')}
