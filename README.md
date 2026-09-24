@@ -22,4 +22,6 @@ Place the configuration script before the application script in `index.html`. Us
 
 - Add a serverless search proxy for production API key protection.
 - Decode GIF frames in the browser.
-- Render timed captions to an exported GIF.
+- Render timed captions from source GIF frames.
+
+The current export creates a local GIF from the preview and caption. It uses `gif.js` from a CDN, so the browser does the rendering and no upload is required.
