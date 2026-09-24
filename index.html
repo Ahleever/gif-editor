@@ -23,11 +23,44 @@
       </div>
     </main></div>
   <script>
+    const demoGifs = Array.from(document.querySelectorAll('.gif'));
+    const tenorApiKey = window.TENOR_API_KEY || '';
+
     function updateCaption(){const v=document.getElementById('captionInput').value;document.getElementById('previewCaption').innerHTML=v.replace(/\n/g,'<br>');document.getElementById('char').textContent=v.length+' / 80'}
     function resizeCaption(v){document.getElementById('previewCaption').style.fontSize=v+'px'}
     function togglePlay(){const b=document.getElementById('play');b.textContent=b.textContent==='▶'?'Ⅱ':'▶'}
-    function searchGifs(){const q=document.getElementById('search').value||'your search';document.getElementById('resultTitle').textContent='More like “'+q+'”'}
-    function selectGif(b){document.querySelector('.stage').style.filter='hue-rotate('+Math.floor(Math.random()*90)+'deg)';b.textContent='Selected';setTimeout(()=>b.textContent='Use GIF',900)}
+
+    async function searchGifs(){
+      const query=document.getElementById('search').value.trim()||'reaction';
+      document.getElementById('resultTitle').textContent='More like “'+query+'”';
+      if(!tenorApiKey){return}
+      const endpoint='https://tenor.googleapis.com/v2/search?q='+encodeURIComponent(query)+'&key='+encodeURIComponent(tenorApiKey)+'&client_key=loopline&limit=5&media_filter=gif';
+      try{
+        const response=await fetch(endpoint);
+        if(!response.ok){throw new Error('GIF search failed')}
+        const payload=await response.json();
+        const results=payload.results||[];
+        results.forEach((result,index)=>{
+          const image=result.media_formats?.tinygif?.url||result.media_formats?.gif?.url;
+          if(!image||!demoGifs[index]){return}
+          demoGifs[index].style.backgroundImage='url("'+image+'")';
+          demoGifs[index].style.backgroundSize='cover';
+          demoGifs[index].dataset.gifUrl=image;
+          demoGifs[index].querySelector('label').textContent=result.content_description||query;
+        });
+      }catch(error){
+        document.getElementById('resultTitle').textContent='More like “'+query+'” · demo results';
+      }
+    }
+
+    function selectGif(button){
+      const tile=button.closest('.gif');
+      const image=tile.dataset.gifUrl;
+      if(image){document.querySelector('.scene').style.backgroundImage='url("'+image+'")';document.querySelector('.scene').style.backgroundSize='cover'}else{document.querySelector('.stage').style.filter='hue-rotate('+Math.floor(Math.random()*90)+'deg)'}
+      button.textContent='Selected';
+      setTimeout(()=>button.textContent='Use GIF',900);
+    }
+
     function addCaption(){alert('Caption 2 added to the timeline. In the next pass, it will get its own style and timing controls.')}
     function exportGif(){alert('Export is ready to connect to browser-side GIF rendering (WASM/ffmpeg).')}
   </script>
