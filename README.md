@@ -8,15 +8,15 @@ Open `index.html` in a browser.
 
 ## GIF search
 
-The editor works with demo results by default. To enable Tenor search, set a client-side key before loading the page:
+The editor works with demo results by default. To enable Klipy search, create a test key at [partner.klipy.com/api-keys](https://partner.klipy.com/api-keys), then set it before loading the page:
 
 ```html
 <script>
-  window.TENOR_API_KEY = "your-key";
+  window.KLIPY_API_KEY = "your-key";
 </script>
 ```
 
-Place the configuration script before the application script in `index.html`. Use a restricted key for public hosting.
+Place the configuration script before the application script in `index.html`. Klipy test keys allow up to 100 requests per hour. Use a restricted key for public hosting and follow Klipy attribution requirements.
 
 ## Next steps
 
