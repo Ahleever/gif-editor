@@ -43,12 +43,14 @@
       }
       const endpoint=searchProxyUrl
         ? searchProxyUrl+'?q='+encodeURIComponent(query)
-        : 'https://api.klipy.com/v2/search?q='+encodeURIComponent(query)+'&key='+encodeURIComponent(klipyApiKey)+'&client_key=loopline&limit=5&media_filter=gif';
+        : 'https://api.klipy.com/v2/search?q='+encodeURIComponent(query)+'&key='+encodeURIComponent(klipyApiKey)+'&client_key=loopline&limit=20&media_filter=gif';
       try{
         const response=await fetch(endpoint);
         if(!response.ok){throw new Error('GIF search failed')}
         const payload=await response.json();
         const results=payload.results||[];
+        renderResults(results,query);
+        document.querySelector('.results').scrollIntoView({behavior:'smooth',block:'start'});
         results.forEach((result,index)=>{
           const image=result.media_formats?.tinygif?.url||result.media_formats?.gif?.url;
           if(!image||!demoGifs[index]){return}
@@ -61,6 +63,29 @@
       }catch(error){
         document.getElementById('resultTitle').textContent='More like “'+query+'” · demo results';
       }
+    }
+
+    function renderResults(results,query){
+      const grid=document.querySelector('.grid');
+      grid.replaceChildren();
+      results.forEach(result=>{
+        const image=result.media_formats?.gif?.url||result.url;
+        if(!image){return}
+        const tile=document.createElement('div');
+        const button=document.createElement('button');
+        const label=document.createElement('label');
+        tile.className='gif has-image';
+        tile.dataset.gifUrl=image;
+        tile.style.backgroundImage='url("'+image+'")';
+        tile.style.backgroundSize='cover';
+        button.className='use';
+        button.textContent='Use GIF';
+        label.textContent=result.content_description||result.title||query;
+        button.addEventListener('click',()=>selectGif(button));
+        tile.append(button,label);
+        grid.append(tile);
+      });
+      document.getElementById('resultTitle').textContent=results.length+' GIFs for “'+query+'”';
     }
 
     function selectGif(button){
