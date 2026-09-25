@@ -16,6 +16,10 @@ The preview now uses a real image element with explicit layering. Selecting a re
 
 The local Klipy request returned HTTP 200 and valid GIF URLs. The browser reproduction updated result labels after search and changed the selected result state after preview selection.
 
+## Verification update
+
+The browser loaded a selected Klipy GIF successfully. The image was complete at 498 by 281 pixels. The local app is working.
+
 ## Status
 
 DONE_WITH_CONCERNS: Search and preview are fixed locally. The public site still needs the server-side proxy deployed before it can use Klipy search.
