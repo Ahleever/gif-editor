@@ -143,4 +143,70 @@
       gif.render();
     }
   </script>
+  <script>
+    window.looplineState={captions:[{id:1,text:'BRO THOUGHT HE WON',start:1,end:8.2,size:42,color:'#ffffff'}],selectedCaptionId:1,currentTime:4.1,playing:false,playTimer:null};
+
+    function currentCaption(){return window.looplineState.captions.find(caption=>caption.id===window.looplineState.selectedCaptionId)||window.looplineState.captions[0]}
+    function renderCaption(){
+      const caption=currentCaption();
+      const preview=document.getElementById('previewCaption');
+      preview.innerHTML=caption.text.replace(/\n/g,'<br>');
+      preview.style.fontSize=caption.size+'px';
+      preview.style.color=caption.color;
+      preview.style.opacity=window.looplineState.currentTime>=caption.start&&window.looplineState.currentTime<=caption.end?'1':'0';
+      document.getElementById('captionInput').value=caption.text;
+      document.getElementById('char').textContent=caption.text.length+' / 80';
+    }
+    function updateCaption(){const caption=currentCaption();caption.text=document.getElementById('captionInput').value.slice(0,80);renderCaption()}
+    function resizeCaption(value){currentCaption().size=Number(value);renderCaption()}
+    function updateTiming(){
+      const caption=currentCaption();
+      caption.start=Number(document.getElementById('captionStart').value)/10;
+      caption.end=Number(document.getElementById('captionEnd').value)/10;
+      if(caption.end<=caption.start){caption.end=caption.start+.1;document.getElementById('captionEnd').value=Math.round(caption.end*10)}
+      document.getElementById('timingValue').textContent=caption.start.toFixed(1)+'s → '+caption.end.toFixed(1)+'s';
+      renderCaption();
+    }
+    function togglePlay(){
+      const state=window.looplineState;
+      state.playing=!state.playing;
+      document.getElementById('play').textContent=state.playing?'Ⅱ':'▶';
+      if(state.playing){state.playTimer=setInterval(()=>{state.currentTime=(state.currentTime+.1)%12.4;document.querySelector('.playhead').style.left=(state.currentTime/12.4*100)+'%';renderCaption()},100)}else{clearInterval(state.playTimer)}
+    }
+    function addCaption(){
+      const id=window.looplineState.captions.length+1;
+      window.looplineState.captions.push({id,text:'NEW CAPTION',start:8.3,end:12.2,size:42,color:'#ffffff'});
+      window.looplineState.selectedCaptionId=id;
+      const clip=document.createElement('div');
+      clip.className='clip';
+      clip.textContent='Caption '+id;
+      clip.style.left='67%';
+      clip.style.width='30%';
+      document.querySelector('.track').append(clip);
+      renderCaption();
+    }
+    function chooseColor(color){currentCaption().color=color;renderCaption()}
+    function addUploadControl(){
+      const input=document.createElement('input');
+      const button=document.createElement('button');
+      input.type='file';
+      input.accept='image/gif';
+      input.hidden=true;
+      button.className='ghost';
+      button.textContent='Upload GIF';
+      button.addEventListener('click',()=>input.click());
+      input.addEventListener('change',()=>{const file=input.files?.[0];if(!file){return}const preview=document.getElementById('gifImage');preview.src=URL.createObjectURL(file);preview.hidden=false;document.querySelector('.scene').classList.add('has-image')});
+      document.querySelector('.search').append(button,input);
+    }
+    function addTimingControls(){
+      const field=document.querySelector('.right .field:nth-of-type(2)');
+      field.innerHTML='<div class="labelrow">Timing <span id="timingValue">1.0s → 8.2s</span></div><input id="captionStart" class="range" type="range" min="0" max="120" value="10"><input id="captionEnd" class="range" type="range" min="1" max="124" value="82">';
+      document.getElementById('captionStart').addEventListener('input',updateTiming);
+      document.getElementById('captionEnd').addEventListener('input',updateTiming);
+    }
+    document.querySelectorAll('.swatch').forEach(swatch=>swatch.addEventListener('click',()=>chooseColor(getComputedStyle(swatch).backgroundColor)));
+    addUploadControl();
+    addTimingControls();
+    renderCaption();
+  </script>
 </body></html>
