@@ -63,7 +63,8 @@
           demoGifs[index].querySelector('label').textContent=result.content_description||query;
         });
       }catch(error){
-        document.getElementById('resultTitle').textContent='More like “'+query+'” · demo results';
+        console.error(error);
+        document.getElementById('resultTitle').textContent='Search unavailable · check the proxy connection';
       }
     }
 
