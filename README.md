@@ -2,6 +2,8 @@
 
 Loopline is a browser-based GIF editor. It lets users search for GIFs, add captions, and set when captions appear.
 
+Live app: [loopline-gif-editor.vercel.app](https://loopline-gif-editor.vercel.app/)
+
 ## Local preview
 
 Open `index.html` in a browser.
@@ -23,6 +25,10 @@ For local use, copy `config.example.js` to `config.js` and add the key there. `c
 - Add a serverless search proxy for production API key protection.
 - Decode GIF frames in the browser.
 - Render timed captions from source GIF frames.
+
+## Klipy limits
+
+The Klipy test key allows 100 API requests per hour. Image downloads do not create new API requests. Search and Discover use up to 50 results per request and use Klipy's cursor for more results.
 
 The current export creates a local GIF from the preview and caption. It uses `gif.js` from a CDN, so the browser does the rendering and no upload is required.
 
