@@ -64,7 +64,7 @@
         });
       }catch(error){
         console.error(error);
-        document.getElementById('resultTitle').textContent='Search unavailable · check the proxy connection';
+        document.getElementById('resultTitle').textContent='Search unavailable · '+(error.message||'check the proxy connection');
       }
     }
 
