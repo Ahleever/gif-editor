@@ -396,7 +396,7 @@
     }
     function showFavorites(){const favorites=getFavorites();renderGallery(favorites.map(item=>({url:item.url,title:item.title})), 'favorites', false);document.getElementById('resultTitle').textContent=favorites.length+' favorite GIF'+(favorites.length===1?'':'s');document.getElementById('favoritesToggle').classList.add('active');document.getElementById('favoritesToggle').textContent='♥ Favorites'}
     document.getElementById('favoritesToggle').addEventListener('click',()=>{if(document.getElementById('favoritesToggle').classList.contains('active')){document.getElementById('favoritesToggle').classList.remove('active');document.getElementById('favoritesToggle').textContent='♡ Favorites';window.discoverGifs()}else{showFavorites()}});
-    window.selectGif=target=>{const tile=target.closest('.gif');const preview=document.getElementById('gifImage');preview.crossOrigin='anonymous';preview.src=tile.dataset.gifUrl;preview.hidden=false;document.querySelector('.scene').classList.add('has-image');renderCaption()};
+    window.selectGif=target=>{const tile=target.closest('.gif');const preview=document.getElementById('gifImage');preview.crossOrigin='anonymous';preview.src=tile.dataset.gifUrl;preview.hidden=false;document.querySelector('.scene').classList.add('has-image');renderCaption();document.querySelector('.preview-card')?.scrollIntoView({behavior:'smooth',block:'start'})};
     restoreCaptionCard();
     renderDurationTrack();
     bindDurationDrag();
