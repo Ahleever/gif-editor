@@ -1,5 +1,14 @@
 export default async function handler(request, response) {
-  response.setHeader('Access-Control-Allow-Origin', 'https://ahleever.github.io');
+  const origin = request.headers.origin;
+  const allowedOrigins = new Set([
+    'https://ahleever.github.io',
+    'http://localhost:4173',
+    'http://127.0.0.1:4173',
+  ]);
+  response.setHeader(
+    'Access-Control-Allow-Origin',
+    origin && allowedOrigins.has(origin) ? origin : 'https://ahleever.github.io',
+  );
   response.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   response.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
