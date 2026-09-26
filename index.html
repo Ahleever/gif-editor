@@ -15,11 +15,11 @@
   </style>
 </head>
 <body>
-  <div class="app"><aside><div class="brand"><span class="mark">↻</span> loopline</div><nav class="nav"><button class="active">⌁ <span>Editor</span></button><button>⌕ <span>Discover GIFs</span></button><button>▱ <span>My projects</span></button></nav><div class="tip"><strong>Tip for timing captions</strong> Drag the purple bar handles to choose exactly when your text appears.</div></aside>
+  <div class="app"><aside><div class="brand"><span class="mark">↻</span> loopline</div><nav class="nav"><button class="active" id="editorNav">⌁ <span>Editor</span></button><button id="discoverNav">⌕ <span>Discover GIFs</span></button><button id="projectsNav">▱ <span>My projects</span></button></nav><div class="tip"><strong>Tip for timing captions</strong> Drag the purple bar handles to choose exactly when your text appears.</div></aside>
     <main><div class="top"><div><div class="eyebrow">New project</div><h1>Make a GIF say more.</h1></div><div class="avatar">OC</div></div>
       <div class="search"><span style="padding-left:10px;color:#a0a4ad">⌕</span><input id="search" value="Matthew Stafford" aria-label="Search GIFs"><button onclick="searchGifs()">Search GIFs</button></div>
       <div class="content"><section class="card preview-card"><div class="cardhead"><h2>Preview</h2><span class="pill">12.4s · 480 × 270</span></div><div class="stage"><div class="scene"><img class="gif-image" id="gifImage" alt="Selected GIF preview" hidden><div class="caption" id="previewCaption">BRO THOUGHT<br>HE WON</div></div></div><div class="controls"><span class="small">00:04.1</span><button class="play" onclick="togglePlay()" id="play">▶</button><span class="small">00:12.4</span></div><div class="toolbar"><button class="ghost">↶ Undo</button><button class="ghost">↷ Redo</button><span style="flex:1"></span><button class="ghost">▣ Fit</button></div><div class="timeline"><div class="ruler"><span>0:00</span><span>0:03</span><span>0:06</span><span>0:09</span><span>0:12</span></div><div class="track"><div class="clip"><i class="handle"></i>Caption 1<i class="handle"></i></div><div class="playhead"></div></div></div></section>
-        <section class="card right"><h2>Caption 1</h2><div class="field"><div class="labelrow">Text <span id="char">17 / 80</span></div><input class="textinput" id="captionInput" value="BRO THOUGHT HE WON" oninput="updateCaption()"></div><div class="field"><div class="labelrow">Timing <span>0:01.0 → 0:08.2</span></div><input class="range" type="range" min="0" max="100" value="58"></div><div class="field"><div class="labelrow">Size <span>42 px</span></div><input class="range" type="range" min="16" max="72" value="42" oninput="resizeCaption(this.value)"></div><div class="field"><div class="labelrow">Color</div><div class="swatches"><i class="swatch selected" style="background:#fff"></i><i class="swatch" style="background:#ffe169"></i><i class="swatch" style="background:#ff7272"></i><i class="swatch" style="background:#17191f"></i></div></div><button class="add" onclick="addCaption()">＋ Add another caption</button><button class="export" onclick="exportGif()">Export GIF <span style="opacity:.6">→</span></button></section>
+        <section class="card right"><h2>Caption 1</h2><div class="field"><div class="labelrow">Text <span id="char">17 / 80</span></div><input class="textinput" id="captionInput" value="BRO THOUGHT HE WON" oninput="updateCaption()"></div><div class="field"><div class="labelrow">Timing <span>0:01.0 → 0:08.2</span></div><input class="range" type="range" min="0" max="100" value="58"></div><div class="field"><div class="labelrow">Size <span>42 px</span></div><input class="range" type="range" min="16" max="72" value="42" oninput="resizeCaption(this.value)"></div><div class="field"><div class="labelrow">Duration <span id="durationValue">12.4s</span></div><input id="durationRange" class="range" type="range" min="1" max="15" step="0.1" value="12.4"></div><div class="field"><div class="labelrow">Color</div><div class="swatches"><i class="swatch selected" style="background:#fff"></i><i class="swatch" style="background:#ffe169"></i><i class="swatch" style="background:#ff7272"></i><i class="swatch" style="background:#17191f"></i></div></div><button class="add" onclick="addCaption()">＋ Add another caption</button><button class="export" onclick="exportGif()">Export GIF <span style="opacity:.6">→</span></button></section>
         <section class="results"><h2 id="resultTitle">More like “Matthew Stafford”</h2><div class="grid"><div class="gif"><button class="use" onclick="selectGif(this)">Use GIF</button><label>game face</label></div><div class="gif"><button class="use" onclick="selectGif(this)">Use GIF</button><label>no way</label></div><div class="gif"><button class="use" onclick="selectGif(this)">Use GIF</button><label>reaction</label></div><div class="gif"><button class="use" onclick="selectGif(this)">Use GIF</button><label>sideline</label></div><div class="gif"><button class="use" onclick="selectGif(this)">Use GIF</button><label>let's go</label></div></div></section>
       </div>
     </main></div>
@@ -211,5 +211,117 @@
     addUploadControl();
     addTimingControls();
     renderCaption();
+  </script>
+  <style>.handle{cursor:ew-resize}.load-more{display:block;margin:18px auto 0;background:#f1efff;color:var(--accent);padding:10px 16px;border-radius:9px;font-weight:800}</style>
+  <script>
+    const completeState=window.looplineState;
+    completeState.duration=12.4;
+    completeState.nextPosition='';
+
+    function apiEndpoint(parameters){
+      const proxy=window.LOOPLINE_SEARCH_PROXY_URL||'';
+      const key=window.KLIPY_API_KEY||'';
+      const url=new URL(proxy||'https://api.klipy.com/v2/search');
+      Object.entries(parameters).forEach(([name,value])=>{if(value!==''&&value!==undefined){url.searchParams.set(name,value)}});
+      if(!proxy){url.searchParams.set('key',key);url.searchParams.set('client_key','loopline');url.searchParams.set('media_filter','gif')}
+      return url.toString();
+    }
+    function renderGallery(results,query,append){
+      const grid=document.querySelector('.grid');
+      if(!append){grid.replaceChildren()}
+      results.forEach(result=>{
+        const image=result.media_formats?.gif?.url||result.url;
+        if(!image){return}
+        const tile=document.createElement('div');
+        const button=document.createElement('button');
+        const label=document.createElement('label');
+        tile.className='gif has-image';
+        tile.dataset.gifUrl=image;
+        tile.style.backgroundImage='url("'+image+'")';
+        tile.style.backgroundSize='cover';
+        button.className='use';
+        button.textContent='Use GIF';
+        label.textContent=result.content_description||result.title||query;
+        button.addEventListener('click',()=>window.selectGif(button));
+        tile.append(button,label);
+        grid.append(tile);
+      });
+      document.getElementById('resultTitle').textContent=grid.children.length+' GIFs for “'+query+'”';
+    }
+    function renderLoadMore(query){
+      document.querySelector('.load-more')?.remove();
+      if(!completeState.nextPosition){return}
+      const button=document.createElement('button');
+      button.className='load-more';
+      button.textContent='Load more GIFs';
+      button.addEventListener('click',()=>loadResults(query,false,true));
+      document.querySelector('.results').append(button);
+    }
+    async function loadResults(query,discover,append){
+      const title=discover?'Discover GIFs':'More like “'+query+'”';
+      document.getElementById('resultTitle').textContent=title+' · loading';
+      const endpoint=apiEndpoint({q:discover?'trending':query,discover:discover?'1':'',limit:'50',pos:append?completeState.nextPosition:''});
+      try{
+        const response=await fetch(endpoint);
+        if(!response.ok){throw new Error('Search request failed')}
+        const payload=await response.json();
+        completeState.nextPosition=payload.next||'';
+        renderGallery(payload.results||[],discover?'trending':query,append);
+        renderLoadMore(discover?'trending':query);
+        document.querySelector('.results').scrollIntoView({behavior:'smooth',block:'start'});
+      }catch(error){document.getElementById('resultTitle').textContent='Search unavailable · '+error.message}
+    }
+    window.searchGifs=()=>loadResults(document.getElementById('search').value.trim()||'reaction',false,false);
+    window.discoverGifs=()=>loadResults('trending',true,false);
+    document.getElementById('discoverNav').addEventListener('click',window.discoverGifs);
+    document.getElementById('editorNav').addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
+    document.getElementById('durationRange').addEventListener('input',event=>{completeState.duration=Number(event.target.value);document.getElementById('durationValue').textContent=completeState.duration.toFixed(1)+'s';document.querySelector('.pill').textContent=completeState.duration.toFixed(1)+'s · 480 × 270';if(completeState.currentTime>completeState.duration){completeState.currentTime=completeState.duration}renderCaption()});
+    function syncTimingInputs(caption){document.getElementById('captionStart').value=Math.round(caption.start*10);document.getElementById('captionEnd').value=Math.round(caption.end*10);document.getElementById('timingValue').textContent=caption.start.toFixed(1)+'s → '+caption.end.toFixed(1)+'s'}
+    function renderTimeline(){
+      const track=document.querySelector('.track');
+      track.replaceChildren();
+      completeState.captions.forEach(caption=>{
+        const clip=document.createElement('div');
+        const startHandle=document.createElement('i');
+        const endHandle=document.createElement('i');
+        clip.className='clip';
+        clip.dataset.captionId=caption.id;
+        clip.style.left=(caption.start/completeState.duration*100)+'%';
+        clip.style.width=((caption.end-caption.start)/completeState.duration*100)+'%';
+        startHandle.className='handle';
+        endHandle.className='handle';
+        clip.append(startHandle,document.createTextNode('Caption '+caption.id),endHandle);
+        track.append(clip);
+        bindClipDrag(clip,caption,startHandle,endHandle);
+      });
+      const playhead=document.createElement('div');
+      playhead.className='playhead';
+      playhead.style.left=(completeState.currentTime/completeState.duration*100)+'%';
+      track.append(playhead);
+    }
+    function bindClipDrag(clip,caption,startHandle,endHandle){
+      const drag=(event,side)=>{
+        event.preventDefault();
+        const move=moveEvent=>{
+          const bounds=document.querySelector('.track').getBoundingClientRect();
+          const time=Math.max(0,Math.min(completeState.duration,((moveEvent.clientX-bounds.left)/bounds.width)*completeState.duration));
+          if(side==='start'){caption.start=Math.min(time,caption.end-.1)}else{caption.end=Math.max(time,caption.start+.1)}
+          clip.style.left=(caption.start/completeState.duration*100)+'%';
+          clip.style.width=((caption.end-caption.start)/completeState.duration*100)+'%';
+          if(caption.id===completeState.selectedCaptionId){syncTimingInputs(caption);renderCaption()}
+        };
+        const stop=()=>{document.removeEventListener('pointermove',move);document.removeEventListener('pointerup',stop)};
+        document.addEventListener('pointermove',move);
+        document.addEventListener('pointerup',stop,{once:true});
+      };
+      startHandle.addEventListener('pointerdown',event=>drag(event,'start'));
+      endHandle.addEventListener('pointerdown',event=>drag(event,'end'));
+      clip.addEventListener('click',()=>{completeState.selectedCaptionId=caption.id;syncTimingInputs(caption);renderCaption()});
+    }
+    window.addCaption=()=>{const id=completeState.captions.length+1;completeState.captions.push({id,text:'NEW CAPTION',start:Math.min(completeState.duration-1,8.3),end:completeState.duration-.2,size:42,color:'#ffffff'});completeState.selectedCaptionId=id;renderTimeline();syncTimingInputs(currentCaption());renderCaption()};
+    window.selectGif=button=>{const tile=button.closest('.gif');const image=tile.dataset.gifUrl;const preview=document.getElementById('gifImage');preview.crossOrigin='anonymous';preview.src=image;preview.hidden=false;document.querySelector('.scene').classList.add('has-image');button.textContent='Selected';setTimeout(()=>button.textContent='Use GIF',900)};
+    window.togglePlay=()=>{completeState.playing=!completeState.playing;document.getElementById('play').textContent=completeState.playing?'Ⅱ':'▶';if(completeState.playing){completeState.playTimer=setInterval(()=>{completeState.currentTime=(completeState.currentTime+.1)%completeState.duration;document.querySelector('.playhead').style.left=(completeState.currentTime/completeState.duration*100)+'%';renderCaption()},100)}else{clearInterval(completeState.playTimer)}};
+    window.exportGif=()=>{const image=document.getElementById('gifImage');const canvas=document.createElement('canvas');const width=480;const height=270;canvas.width=width;canvas.height=height;const context=canvas.getContext('2d');const gif=new GIF({workers:2,quality:10,width,height,workerScript:'https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js'});const frameCount=Math.max(1,Math.round(completeState.duration*10));for(let frame=0;frame<frameCount;frame+=1){const time=frame/10;context.fillStyle='#30394e';context.fillRect(0,0,width,height);if(image.complete&&image.naturalWidth){context.drawImage(image,0,0,width,height)}completeState.captions.filter(caption=>time>=caption.start&&time<=caption.end).forEach(caption=>{context.fillStyle=caption.color;context.font='900 '+caption.size+'px system-ui';context.textAlign='center';context.textBaseline='middle';context.strokeStyle='#111';context.lineWidth=6;const lines=caption.text.split('\n');lines.forEach((line,index)=>{const y=height*.72+index*caption.size;context.strokeText(line,width/2,y);context.fillText(line,width/2,y)})});gif.addFrame(canvas,{copy:true,delay:100})}const button=document.querySelector('.export');button.textContent='Rendering…';gif.on('finished',blob=>{const link=document.createElement('a');link.href=URL.createObjectURL(blob);link.download='loopline-export.gif';link.click();URL.revokeObjectURL(link.href);button.textContent='Export GIF →'});gif.render()};
+    renderTimeline();
   </script>
 </body></html>
